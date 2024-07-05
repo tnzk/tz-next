@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { MouseEventHandler, useEffect, useRef } from "react";
 import * as CT from "countries-and-timezones";
@@ -6,21 +6,27 @@ import * as CT from "countries-and-timezones";
 export default function WorldMap({ onClick = (cc: CT.Country) => {} }) {
   const svgElem = useRef(null);
 
-  const g:MouseEventHandler<SVGSVGElement> = (event) => {
-    if (!svgElem) return;
+  const g: MouseEventHandler<SVGSVGElement> = (event) => {
+    if (!svgElem?.current) return;
+
+    // @ts-ignore
     const w = svgElem.current.getBoundingClientRect().width;
     const x = event.clientX;
     //console.log(x, w, (x/w)*100)
   };
 
-  const f:MouseEventHandler<SVGSVGElement> = (event) => {
+  const f: MouseEventHandler<SVGSVGElement> = (event) => {
     const e = event.target;
+    // @ts-ignore
     if (e.id) {
+      // @ts-ignore
       const cc = CT.getCountry(e.id);
       onClick?.(cc);
       return;
     }
+    // @ts-ignore
     if (e.className.baseVal) {
+      // @ts-ignore
       const name = e.className.baseVal;
       if (name === "Russian Federation") {
         onClick?.(CT.getAllCountries().RU);
@@ -31,7 +37,9 @@ export default function WorldMap({ onClick = (cc: CT.Country) => {} }) {
         return;
       }
 
-      const country = Object.entries(CT.getAllCountries()).filter(([k,v]) => v.name.startsWith(name)).map(([k,v]) => v)[0];
+      const country = Object.entries(CT.getAllCountries())
+        .filter(([k, v]) => v.name.startsWith(name))
+        .map(([k, v]) => v)[0];
       if (country) {
         onClick?.(country);
       }
@@ -52,11 +60,11 @@ export default function WorldMap({ onClick = (cc: CT.Country) => {} }) {
         fill="#ececec"
         height="857"
         stroke="black"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width=".5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth=".5"
         version="1.2"
-        viewbox="0 0 2000 857"
+        viewBox="0 0 2000 857"
         width="2000"
         xmlns="http://www.w3.org/2000/svg"
       >
