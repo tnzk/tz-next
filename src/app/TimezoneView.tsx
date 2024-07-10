@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Temporal, Intl, toTemporalInstant } from "@js-temporal/polyfill";
+import { Temporal, toTemporalInstant } from "@js-temporal/polyfill";
 // @ts-ignore
 Date.prototype.toTemporalInstant = toTemporalInstant;
 import * as CT from "countries-and-timezones";
@@ -117,9 +117,10 @@ export default function TimezoneView({
             onChangeTime={handleOnChange}
             onChangeTimezone={(tz) => setTimezone1(tz)}
             onReset={() => setTimezone1("")}
+            placeholder="Click where you are in"
           />
 
-          {timezone2 && (
+          {timezone1 && (
             <TimezoneCard
               tz={timezone2 ?? ""}
               timezones={timezoneOptions2}
@@ -127,6 +128,7 @@ export default function TimezoneView({
               onChangeTime={handleOnChange}
               onChangeTimezone={(tz) => setTimezone2(tz)}
               onReset={() => setTimezone2("")}
+              placeholder="Click where your respondent is in"
             />
           )}
         </div>

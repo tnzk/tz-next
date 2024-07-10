@@ -1,5 +1,47 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { ChangeEventHandler } from "react";
+import { ChangeEventHandler, useState } from "react";
+
+// offset is undefined when the name is recognized by Temporal
+type ResolvedTimezoneAbbrev = { name: string; offset: string | undefined };
+async function lookupTimezoneAbbrev(
+  abbrev: string
+): Promise<ResolvedTimezoneAbbrev[]> {
+  if (abbrev === "") return [];
+  const res = await fetch(`/tz/abbrev/${encodeURIComponent(abbrev)}`);
+  if (res.status === 200) {
+    return res.json();
+  }
+  return [];
+}
+
+async function attemptLocalizeTime(
+  time: Temporal.Instant,
+  timezonelike: string
+) {
+  try {
+    // Try Temporal first
+    return time
+      .toZonedDateTimeISO(timezonelike)
+      .toPlainDateTime()
+      .toString({ smallestUnit: "seconds" });
+  } catch {
+    if (timezonelike !== "") {
+      // Fallback to the in-house list
+      const res = await fetch(`/tz/abbrev/${encodeURIComponent(timezonelike)}`);
+      if (res.status === 200) {
+        const possibleTimezones = await res.json();
+        if (possibleTimezones[0]) {
+          return time
+            .toZonedDateTimeISO(possibleTimezones[0].offset)
+            .toPlainDateTime()
+            .toString({ smallestUnit: "seconds" });
+        }
+      }
+    }
+
+    return "";
+  }
+}
 
 type Props = {
   tz: string;
@@ -8,6 +50,7 @@ type Props = {
   onChangeTime: (plainDateTime: string, timezone: string) => void;
   onChangeTimezone: (timezone: string) => void;
   onReset: () => void;
+  placeholder: string;
 };
 export default function TimezoneCard({
   tz,
@@ -16,24 +59,36 @@ export default function TimezoneCard({
   onChangeTime,
   onChangeTimezone,
   onReset,
+  placeholder,
 }: Props) {
+  const [localtime, setLocaltime] = useState("");
+  const [possibleTimezones, setPossibleTimezones] = useState<
+    ResolvedTimezoneAbbrev[]
+  >([]);
+
   const handleOnChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     onChangeTime(event.target.value, tz);
   };
 
-  const localtime = (() => {
-    try {
-      return time
-        .toZonedDateTimeISO(tz)
-        .toPlainDateTime()
-        .toString({ smallestUnit: "seconds" });
-    } catch {
-      return "";
-    }
-  })();
+  const onValidate: ChangeEventHandler<HTMLInputElement> = async (event) => {
+    const timezonelike = event.target.value;
+    const recognizedByTemporal =
+      (await attemptLocalizeTime(time, timezonelike)) !== "";
+    const temporalSuggestion = recognizedByTemporal
+      ? [{ name: timezonelike, offset: undefined }]
+      : [];
+    const resolved = await lookupTimezoneAbbrev(timezonelike);
+    setPossibleTimezones([...temporalSuggestion, ...resolved]);
+  };
+
+  const onClickTimezoneSuggestion = (timezonelike: string) => {
+    onChangeTimezone(timezonelike);
+  };
+
+  attemptLocalizeTime(time, tz).then((s) => setLocaltime(s));
 
   return (
-    <div className="bg-white rounded-xl border-blue-600 border-2 p-6 mx-4 sm:mx-auto backdrop-blur-2xl shadow-lg flex-0 sm:w-2/3 xl:w-1/2 text-center text-blue-950">
+    <div className="flex items-center justify-center bg-white rounded-xl border-blue-600 border-2 p-6 mx-4 sm:mx-auto backdrop-blur-2xl shadow-lg flex-0 sm:w-2/3 xl:w-1/2 text-center text-blue-950">
       <div className="flex justify-between items-center">
         <div className="flex-1">
           {tz && (
@@ -72,24 +127,61 @@ export default function TimezoneCard({
               )}
             </>
           )}
-          {tz === "" && <div className="text-2xl">Choose host timezone</div>}
+          {tz === "" && (
+            <div>
+              <div className="text-2xl">{placeholder}</div>
+              <div className="text-left mt-3">
+                <label htmlFor="timezone-search">Or type: </label>
+                <input
+                  name="timezone-search"
+                  type="text"
+                  className="w-full focus:outline-none text-lg text-gray-700 rounded-lg px-3 py-1 my-1 border border-gray-200"
+                  onChange={onValidate}
+                />
+              </div>
+              <ul className="text-left">
+                {possibleTimezones.map((tz) => (
+                  <li key={tz.name} className="w-full">
+                    <a
+                      className="hover:bg-gray-200 cursor-pointer px-2 py-1 block rounded-md"
+                      onClick={() =>
+                        onClickTimezoneSuggestion(tz.offset ?? tz.name)
+                      }
+                    >
+                      {!tz.offset && <>{tz.name}</>}
+                      {tz.offset && (
+                        <>
+                          {tz.name}{" "}
+                          <span className="text-sm text-gray-700">
+                            as UTC{tz.offset}
+                          </span>
+                        </>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <div className="shrink">
-          <svg
-            onClick={onReset}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-6 cursor-pointer"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
-          </svg>
+          {tz && (
+            <svg
+              onClick={onReset}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6 cursor-pointer"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
+          )}
         </div>
       </div>
     </div>

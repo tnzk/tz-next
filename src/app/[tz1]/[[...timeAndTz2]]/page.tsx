@@ -1,8 +1,6 @@
 "use client";
 
 import TimezoneView from "@/app/TimezoneView";
-import { Temporal } from "@js-temporal/polyfill";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const constructPath = (
@@ -46,11 +44,6 @@ export default function Home({
     window.history.replaceState(null, "", path);
   };
 
-  useEffect(() => {
-    console.log(url);
-
-  }, [tz1, timelike, tz2, setUrl, url]);
-
   return (
     <main className="min-h-screen bg-blue-500">
       <div className="p-4">
@@ -76,6 +69,7 @@ export default function Home({
       <div className="relative flex place-items-center">
         <TimezoneView
           timelike={timelike}
+          tz1={tz1}
           tz2={tz2 ? decodeURIComponent(tz2) : undefined}
           onChange={handleOnChange}
         />
