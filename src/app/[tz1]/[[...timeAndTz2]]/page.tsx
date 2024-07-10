@@ -64,12 +64,12 @@ export default function Home({
         </svg>
       </div>
       <div className="font-serif w-full text-blue-950 text-center pt-6 px-4 text-5xl">
-        Does this work for you?
+        Does this time work for you?
       </div>
       <div className="relative flex place-items-center">
         <TimezoneView
           timelike={timelike}
-          tz1={tz1}
+          tz1={tz1 ? decodeURIComponent(tz1) : undefined}
           tz2={tz2 ? decodeURIComponent(tz2) : undefined}
           onChange={handleOnChange}
         />
