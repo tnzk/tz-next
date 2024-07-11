@@ -52,7 +52,7 @@ export default function Home({ params }: Props) {
         <TimezoneView
           timelike={timelike}
           tz1={tz1 ? decodeURIComponent(tz1) : undefined}
-          tz2={tz2 ? decodeURIComponent(tz2) : undefined}
+          tz2={tz2 ? decodeURIComponent(tz2) : ""}
           onChange={handleOnChange}
         />
       </div>

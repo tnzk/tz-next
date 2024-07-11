@@ -1,47 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { ChangeEventHandler, useEffect, useState } from "react";
-
-// offset is undefined when the name is recognized by Temporal
-type ResolvedTimezoneAbbrev = { name: string; offset: string | undefined };
-async function lookupTimezoneAbbrev(
-  abbrev: string
-): Promise<ResolvedTimezoneAbbrev[]> {
-  if (abbrev === "") return [];
-  const res = await fetch(`/tz/abbrev/${encodeURIComponent(abbrev)}`);
-  if (res.status === 200) {
-    return res.json();
-  }
-  return [];
-}
-
-async function attemptLocalizeTime(
-  time: Temporal.Instant,
-  timezonelike: string
-) {
-  try {
-    // Try Temporal first
-    return time
-      .toZonedDateTimeISO(timezonelike)
-      .toPlainDateTime()
-      .toString({ smallestUnit: "seconds" });
-  } catch {
-    if (timezonelike !== "") {
-      // Fallback to the in-house list
-      const res = await fetch(`/tz/abbrev/${encodeURIComponent(timezonelike)}`);
-      if (res.status === 200) {
-        const possibleTimezones = await res.json();
-        if (possibleTimezones[0]) {
-          return time
-            .toZonedDateTimeISO(possibleTimezones[0].offset)
-            .toPlainDateTime()
-            .toString({ smallestUnit: "seconds" });
-        }
-      }
-    }
-
-    return "";
-  }
-}
+import { TimezoneSearch } from "./TimezoneSearch";
+import { attemptLocalizeTime } from "@/lib/timezoneHelper";
 
 type Props = {
   tz: string;
@@ -62,27 +22,9 @@ export default function TimezoneCard({
   placeholder,
 }: Props) {
   const [localtime, setLocaltime] = useState("");
-  const [possibleTimezones, setPossibleTimezones] = useState<
-    ResolvedTimezoneAbbrev[]
-  >([]);
 
   const handleOnChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     onChangeTime(event.target.value, tz);
-  };
-
-  const onValidate: ChangeEventHandler<HTMLInputElement> = async (event) => {
-    const timezonelike = event.target.value;
-    const recognizedByTemporal =
-      (await attemptLocalizeTime(time, timezonelike)) !== "";
-    const temporalSuggestion = recognizedByTemporal
-      ? [{ name: timezonelike, offset: undefined }]
-      : [];
-    const resolved = await lookupTimezoneAbbrev(timezonelike);
-    setPossibleTimezones([...temporalSuggestion, ...resolved]);
-  };
-
-  const onClickTimezoneSuggestion = (timezonelike: string) => {
-    onChangeTimezone(timezonelike);
   };
 
   useEffect(() => {
@@ -133,37 +75,7 @@ export default function TimezoneCard({
           {tz === "" && (
             <div>
               <div className="text-2xl">{placeholder}</div>
-              <div className="text-left mt-3">
-                <label htmlFor="timezone-search">Or type: </label>
-                <input
-                  name="timezone-search"
-                  type="text"
-                  className="w-full focus:outline-none text-lg text-gray-700 rounded-lg px-3 py-1 my-1 border border-gray-200"
-                  onChange={onValidate}
-                />
-              </div>
-              <ul className="text-left">
-                {possibleTimezones.map((tz) => (
-                  <li key={tz.name} className="w-full">
-                    <a
-                      className="hover:bg-gray-200 cursor-pointer px-2 py-1 block rounded-md"
-                      onClick={() =>
-                        onClickTimezoneSuggestion(tz.offset ?? tz.name)
-                      }
-                    >
-                      {!tz.offset && <>{tz.name}</>}
-                      {tz.offset && (
-                        <>
-                          {tz.name}{" "}
-                          <span className="text-sm text-gray-700">
-                            as UTC{tz.offset}
-                          </span>
-                        </>
-                      )}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <TimezoneSearch onClickTimezoneSuggestion={onChangeTimezone} />
             </div>
           )}
         </div>

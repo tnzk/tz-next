@@ -14,6 +14,7 @@ function getDefaultTime(timelike: string) {
       .subtract(Temporal.Duration.from({ days: 1 }))
       .toInstant(),
   };
+  /* TODO: add more keywords like tomorrow, 11pm, 23:45 etc etc */
   if (keywordTimeMap[timelike]) return keywordTimeMap[timelike];
 
   if (/^\d+$/.test(timelike)) {
@@ -27,7 +28,7 @@ function getDefaultTime(timelike: string) {
 /**
  * TimezoneView
  *
- * @prop tz1 - anything Temporal.TimeZone can construe.
+ * @prop tz1 - anything Temporal.TimeZone recognizes.
  *             cf. https://tc39.es/proposal-temporal/docs/timezone.html#constructor
  * @prop tz2
  * @prop timelike - represents the time. It can take a form of one of the special keywords
@@ -51,25 +52,23 @@ export default function TimezoneView({
   timelike,
   onChange,
 }: Props) {
-  const defaultTz1 = Temporal.Now.timeZoneId();
-
-  const [time, setTime] = useState(getDefaultTime(timelike));
   // https://tc39.es/proposal-temporal/docs/timezone.html
-  const [timezone1, setTimezone1] = useState<string>(tz1 ?? defaultTz1);
-  const [timezone2, setTimezone2] = useState<string>(tz2 ?? "");
-  const [timezoneOptions, setTimezoneOptions] = useState<string[]>([]);
+  const [time, setTime] = useState(getDefaultTime(timelike));
+  const [timezone1, setTimezone1] = useState<string>(tz1 ?? Temporal.Now.timeZoneId());
+  const [timezone2, setTimezone2] = useState<string>(tz2 ?? "Europe/London");
+  const [timezoneOptions1, setTimezoneOptions] = useState<string[]>([]);
   const [timezoneOptions2, setTimezoneOptions2] = useState<string[]>([]);
   const [offsets, setOffsets] = useState<string[]>([]);
 
   const handleOnClick = (country: Country) => {
     if (timezone1) {
       if (!timezone2) {
-        setTimezoneOptions2(country.timezones);
         setTimezone2(country.timezones[0]);
+        setTimezoneOptions2(country.timezones);
       }
     } else {
-      setTimezoneOptions(country.timezones);
       setTimezone1(country.timezones[0]);
+      setTimezoneOptions(country.timezones);
     }
   };
 
@@ -109,7 +108,7 @@ export default function TimezoneView({
         <div className="md:flex justify-center md:space-x-8 space-y-4 md:space-y-0">
           <TimezoneCard
             tz={timezone1 ?? ""}
-            timezones={timezoneOptions}
+            timezones={timezoneOptions1}
             time={time}
             onChangeTime={handleOnChange}
             onChangeTimezone={(tz) => setTimezone1(tz)}

@@ -20,7 +20,7 @@ export const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a href="https://x/tnzk" target="_blank">
+        <a href="https://x.com/tnzk" target="_blank">
           <svg
             fill="currentColor"
             viewBox="0 0 24 24"
