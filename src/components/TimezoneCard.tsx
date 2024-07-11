@@ -1,5 +1,5 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { ChangeEventHandler, useState } from "react";
+import { ChangeEventHandler, useEffect, useState } from "react";
 
 // offset is undefined when the name is recognized by Temporal
 type ResolvedTimezoneAbbrev = { name: string; offset: string | undefined };
@@ -85,7 +85,9 @@ export default function TimezoneCard({
     onChangeTimezone(timezonelike);
   };
 
-  attemptLocalizeTime(time, tz).then((s) => setLocaltime(s));
+  useEffect(() => {
+    attemptLocalizeTime(time, tz).then((s) => setLocaltime(s));
+  }, [time, tz]);
 
   return (
     <div className="flex items-center justify-center bg-white rounded-xl border-blue-600 border-2 p-6 mx-4 sm:mx-auto backdrop-blur-2xl shadow-lg flex-0 sm:w-2/3 xl:w-1/2 text-center text-blue-950">
@@ -98,7 +100,7 @@ export default function TimezoneCard({
                 <input
                   className="focus:outline-none"
                   type="datetime-local"
-                  value={localtime}
+                  defaultValue={localtime}
                   onChange={handleOnChange}
                 />
               </div>
@@ -114,11 +116,12 @@ export default function TimezoneCard({
                   <select
                     name="timezones"
                     id="timezones"
+                    defaultValue={tz}
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     onChange={(event) => onChangeTimezone(event.target.value)}
                   >
                     {timezones.map((s: string) => (
-                      <option key={s} value={s} selected={s === tz}>
+                      <option key={s} value={s}>
                         {s}
                       </option>
                     ))}

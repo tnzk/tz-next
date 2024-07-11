@@ -88,7 +88,7 @@ export default function TimezoneView({
       ];
       setOffsets(offsets);
     } catch {
-      console.error("Invalid timezone identifier(s):", timezone1, timezone2);
+      console.info("Invalid timezone identifier(s):", timezone1, timezone2);
     }
   }, [time, timezone1, timezone2]);
 
