@@ -1,80 +1,71 @@
 "use client";
 
-import { MouseEventHandler, useEffect, useRef } from "react";
-import * as CT from "countries-and-timezones";
-import './WorldMap.css'
+import { MouseEventHandler, useRef } from "react";
+import { Country, getAllCountries, getCountry } from "countries-and-timezones";
+import "./WorldMap.css";
 
+type Props = {
+  offsets: string[];
+  onClick: (country: Country) => void;
+};
 export default function WorldMap({
   offsets = [],
-  onClick = (cc: CT.Country) => {},
-}:{
-  offsets: string[];
-  onClick: (cc: CT.Country) => void;
-}) {
+  onClick = (country: Country) => {},
+}: Props) {
   const svgElem = useRef(null);
 
+  /*
   const handleOnMouseMove: MouseEventHandler<SVGSVGElement> = (event) => {
     if (!svgElem?.current) return;
+  };
+  */
 
-    // @ts-ignore
-    const w = svgElem.current.getBoundingClientRect().width;
-    const x = event.clientX;
-    //console.log(event.target)
-    //console.log(x, w, (x/w)*100)
+  const handleOnMouseEnter: MouseEventHandler = (event) => {
+    if ((event.target as SVGElement).tagName !== "path") return;
+    (event.target as SVGPathElement).setAttribute("fill", "#ccc");
   };
 
-  const handleOnMouseEnter: MouseEventHandler<SVGElement> = (event) => {
-    // @ts-ignore
-    if (event.target.tagName === "svg") return;
-
-    //@ts-ignore
-    event.target.setAttribute('fill', '#ccc');
+  const handleOnMouseLeave: MouseEventHandler = (event) => {
+    if ((event.target as SVGElement).tagName !== "path") return;
+    (event.target as SVGPathElement).setAttribute("fill", "#ececec");
   };
 
-  const handleOnMouseLeave: MouseEventHandler<SVGElement> = (event) => {
-    // @ts-ignore
-    if (event.target.tagName === "svg") return;
+  const handleOnClick: MouseEventHandler = (event) => {
+    if ((event.target as SVGElement).tagName !== "path") return;
 
-    //@ts-ignore
-    event.target.setAttribute('fill', '#ececec');
-  };
+    const pathElement = event.target as SVGPathElement;
 
-  const handleOnClick: MouseEventHandler<SVGSVGElement> = (event) => {
-    const e = event.target;
-    // @ts-ignore
-    if (e.id) {
-      // For `path` elements with ID
-      // @ts-ignore
-      const cc = CT.getCountry(e.id);
-      onClick?.(cc);
+    // For `path` elements with an ID
+    if (pathElement.id) {
+      const country = getCountry(pathElement.id);
+      if (country) {
+        onClick?.(country);
+      }
       return;
     }
-    // @ts-ignore
-    if (e.className.baseVal) {
-      // For `path` elements with only class names
-      // @ts-ignore
-      const name = e.className.baseVal;
+
+    // For `path` elements with only class names
+    if (pathElement.classList) {
+      // https://www.w3.org/TR/SVG/types.html#__svg__SVGElement__className
+      const name = Array.from(pathElement.classList).join(" ");
       if (name === "Russian Federation") {
-        onClick?.(CT.getAllCountries().RU);
+        onClick?.(getAllCountries().RU);
         return;
       }
       if (name === "United States") {
-        onClick?.(CT.getAllCountries().US);
+        onClick?.(getAllCountries().US);
         return;
       }
 
-      const country = Object.entries(CT.getAllCountries())
-        .filter(([k, v]) => v.name.startsWith(name))
-        .map(([k, v]) => v)[0]; //!!!!!!
+      const [_, country] = Object.entries(getAllCountries()).find(([_, v]) =>
+        v.name.startsWith(name)
+      ) ?? [];
+
       if (country) {
         onClick?.(country);
       }
     }
   };
-
-  useEffect(() => {
-//    console.log(svgElem.current);
-  }, []);
 
   return (
     <div className="w-full bg-blue-500">
@@ -85,7 +76,7 @@ export default function WorldMap({
         ref={svgElem}
         className="w-full"
         fill="#ececec"
-        // height="857"
+        /* height="857" */
         stroke="black"
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -1,7 +1,9 @@
 "use client";
 
-import TimezoneView from "@/app/TimezoneView";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import TimezoneView from "@/components/TimezoneView";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 const constructPath = (
   tz1: string | undefined,
@@ -21,14 +23,13 @@ const constructPath = (
   return "";
 };
 
-export default function Home({
-  params,
-}: {
+type Props = {
   params: {
     tz1: string;
     timeAndTz2: string[];
   };
-}) {
+};
+export default function Home({ params }: Props) {
   const { tz1 } = params;
   const [timelike, tz2] = params.timeAndTz2 ?? [];
 
@@ -46,26 +47,7 @@ export default function Home({
 
   return (
     <main className="min-h-screen bg-blue-500">
-      <div className="p-4">
-        <svg
-          onClick={() => (window.location.href = "/")}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.0}
-          stroke="currentColor"
-          className="size-6 text-blue-950 cursor-pointer"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-          />
-        </svg>
-      </div>
-      <div className="font-serif w-full text-blue-950 text-center pt-6 px-4 text-5xl">
-        Does this time work for you?
-      </div>
+      <Header withBackButton />
       <div className="relative flex place-items-center">
         <TimezoneView
           timelike={timelike}
@@ -98,10 +80,7 @@ export default function Home({
           </svg>
         </label>
       </div>
-      <footer className="max-w-lg md:max-w-2xl mx-auto text-center pt-8 pb-4 text-blue-900">
-        Copyright &copy; {new Date().getFullYear()} Does This Work for You All
-        Rights Reserved
-      </footer>
+      <Footer />
     </main>
   );
 }

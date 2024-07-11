@@ -1,26 +1,23 @@
 "use client";
 
 import { Temporal } from "@js-temporal/polyfill";
-import TimezoneView from "./TimezoneView";
-import WorldMap from "./WorldMap";
-import * as CT from "countries-and-timezones";
-
+import { Country } from "countries-and-timezones";
+import WorldMap from "@/components/WorldMap";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
 
 export default function Home() {
   const localtimeZone = Temporal.Now.timeZoneId();
-  const quickStartPath = `/${(encodeURIComponent(localtimeZone))}/now`;
+  const quickStartPath = `/${encodeURIComponent(localtimeZone)}/now`;
 
-  const handleOnClick = (cc: CT.Country) => {
-    const path = "/" + encodeURIComponent(cc.timezones[0]);
+  const handleOnClick = (country: Country) => {
+    const path = "/" + encodeURIComponent(country.timezones[0]);
     window.location.href = path;
   };
 
-
   return (
     <main className="min-h-screen bg-blue-500">
-      <div className="font-serif w-full text-blue-950 text-center pt-32 px-4 text-5xl">
-        Does this time work for you?
-      </div>
+      <Header />
       <div className="max-w-lg text-xl font-serif md:max-w-2xl mx-auto text-left pt-8 pb-4 text-blue-100">
         <div>
           Pick two timezones and a point in time so you can arrange a call,
@@ -32,8 +29,11 @@ export default function Home() {
           <code>-08:00</code>.
         </div>
         <div className="mt-8">
-          Start by clicking on the map below or &nbsp;
-          <a href={quickStartPath} className="underline text-blue-900 hover:text-blue-700">
+          Start by clicking on the map below or{" "}
+          <a
+            href={quickStartPath}
+            className="underline text-blue-900 hover:text-blue-700"
+          >
             your local timezone: {localtimeZone}
           </a>
         </div>
@@ -43,10 +43,7 @@ export default function Home() {
         <WorldMap offsets={[]} onClick={handleOnClick} />
       </div>
 
-      <footer className="max-w-lg md:max-w-2xl mx-auto text-center pt-8 pb-4 text-blue-900">
-        Copyright &copy; {new Date().getFullYear()} Does This Work for You All
-        Rights Reserved
-      </footer>
+      <Footer />
     </main>
   );
 }

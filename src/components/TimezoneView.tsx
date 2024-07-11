@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Temporal, toTemporalInstant } from "@js-temporal/polyfill";
-// @ts-ignore
-Date.prototype.toTemporalInstant = toTemporalInstant;
-import * as CT from "countries-and-timezones";
+import { useEffect, useState } from "react";
+import { Country } from "countries-and-timezones";
 import WorldMap from "./WorldMap";
 import TimezoneCard from "./TimezoneCard";
 
@@ -63,16 +61,15 @@ export default function TimezoneView({
   const [timezoneOptions2, setTimezoneOptions2] = useState<string[]>([]);
   const [offsets, setOffsets] = useState<string[]>([]);
 
-  // TODO: Popup for a country + free texts in timezone panels
-  const handleOnClick = (cc: CT.Country) => {
+  const handleOnClick = (country: Country) => {
     if (timezone1) {
       if (!timezone2) {
-        setTimezoneOptions2(cc.timezones);
-        setTimezone2(cc.timezones[0]);
+        setTimezoneOptions2(country.timezones);
+        setTimezone2(country.timezones[0]);
       }
     } else {
-      setTimezoneOptions(cc.timezones);
-      setTimezone1(cc.timezones[0]);
+      setTimezoneOptions(country.timezones);
+      setTimezone1(country.timezones[0]);
     }
   };
 

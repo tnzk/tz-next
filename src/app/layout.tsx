@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Does this time work for you?",
-  description: "Pick two timezones and a point in time so you can arrange a call, session or anything easily with your friends",
+  description: "Pick two timezones and a point in time so you can easily arrange a call, session or anything with your friends worldwide",
 };
 
 export const viewport: Viewport = {
