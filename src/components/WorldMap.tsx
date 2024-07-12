@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEventHandler, useRef } from "react";
+import { MouseEventHandler, useEffect, useRef } from "react";
 import { Country, getAllCountries, getCountry } from "countries-and-timezones";
 import "./WorldMap.css";
 
@@ -12,23 +12,13 @@ export default function WorldMap({
   offsets = [],
   onClick = (country: Country) => {},
 }: Props) {
-  const svgElem = useRef(null);
+  const svgElem = useRef<SVGSVGElement>(null);
 
-  /*
-  const handleOnMouseMove: MouseEventHandler<SVGSVGElement> = (event) => {
-    if (!svgElem?.current) return;
-  };
-  */
-
-  const handleOnMouseEnter: MouseEventHandler = (event) => {
-    if ((event.target as SVGElement).tagName !== "path") return;
-    (event.target as SVGPathElement).setAttribute("fill", "#ccc");
-  };
-
-  const handleOnMouseLeave: MouseEventHandler = (event) => {
-    if ((event.target as SVGElement).tagName !== "path") return;
-    (event.target as SVGPathElement).setAttribute("fill", "#ececec");
-  };
+  const extraClassess = [
+    "hover:fill-lime-200",
+    "hover:stroke-2",
+    "hover:stroke-lime-700",
+  ];
 
   const handleOnClick: MouseEventHandler = (event) => {
     if ((event.target as SVGElement).tagName !== "path") return;
@@ -47,7 +37,10 @@ export default function WorldMap({
     // For `path` elements with only class names
     if (pathElement.classList) {
       // https://www.w3.org/TR/SVG/types.html#__svg__SVGElement__className
-      const name = Array.from(pathElement.classList).join(" ");
+      const name = Array.from(pathElement.classList)
+        .slice(0, -extraClassess.length)
+        .join(" ");
+      console.log(name);
       if (name === "Russian Federation") {
         onClick?.(getAllCountries().RU);
         return;
@@ -57,9 +50,10 @@ export default function WorldMap({
         return;
       }
 
-      const [_, country] = Object.entries(getAllCountries()).find(([_, v]) =>
-        v.name.startsWith(name)
-      ) ?? [];
+      const [_, country] =
+        Object.entries(getAllCountries()).find(([_, v]) =>
+          v.name.startsWith(name)
+        ) ?? [];
 
       if (country) {
         onClick?.(country);
@@ -67,12 +61,22 @@ export default function WorldMap({
     }
   };
 
+  useEffect(() => {
+    console.log("hey", svgElem);
+    if (svgElem.current) {
+      const paths = Array.from(svgElem.current.getElementsByTagName("path"));
+      for (const pathElem of paths) {
+        pathElem.classList.add(...extraClassess);
+      }
+    }
+  }, [svgElem]);
+
   return (
     <div className="w-full bg-blue-500">
       <svg
         onClick={handleOnClick}
-        onMouseEnter={handleOnMouseEnter}
-        onMouseLeave={handleOnMouseLeave}
+        //        onMouseEnter={handleOnMouseEnter}
+        //        onMouseLeave={handleOnMouseLeave}
         ref={svgElem}
         className="w-full"
         fill="#ececec"
