@@ -40,7 +40,6 @@ export default function WorldMap({
       const name = Array.from(pathElement.classList)
         .slice(0, -extraClassess.length)
         .join(" ");
-      console.log(name);
       if (name === "Russian Federation") {
         onClick?.(getAllCountries().RU);
         return;
@@ -62,7 +61,6 @@ export default function WorldMap({
   };
 
   useEffect(() => {
-    console.log("hey", svgElem);
     if (svgElem.current) {
       const paths = Array.from(svgElem.current.getElementsByTagName("path"));
       for (const pathElem of paths) {
