@@ -34,6 +34,7 @@ export default function Home({ params }: Props) {
   const [timelike, tz2] = params.timeAndTz2 ?? [];
 
   const [url, setUrl] = useState(constructPath(tz1, parseInt(timelike), tz2));
+  const [copied, setCopied] = useState(false);
 
   const handleOnChange = (
     tz1: string | undefined,
@@ -43,6 +44,12 @@ export default function Home({ params }: Props) {
     const path = constructPath(tz1, epochTime, tz2);
     setUrl(window.location.origin + path);
     window.history.replaceState(null, "", path);
+  };
+
+  const handleOnClick = () => {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
   return (
@@ -57,27 +64,36 @@ export default function Home({ params }: Props) {
         />
       </div>
       <div className="max-w-lg md:max-w-2xl mx-auto">
-        <label className="bg-white border-2 shadow-md border-blue-600 rounded-xl p-4 flex items-center gap-2">
-          <input
-            type="text"
-            className="grow focus:outline-none text-lg text-gray-700"
-            readOnly
-            value={url}
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-6 text-blue-900 cursor-pointer"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+        <label className="bg-white border-2 shadow-md border-blue-600 rounded-xl p-4 flex items-center gap-2 justify-between">
+          {copied && (
+            <div className="p-2 bg-lime-100 border border-lime-300 text-lime-800 rounded-lg">
+              Copied!
+            </div>
+          )}
+          {!copied && (
+            <input
+              type="text"
+              className="grow focus:outline-none text-lg text-gray-700 p-2 text-ellipsis"
+              readOnly
+              value={url}
             />
-          </svg>
+          )}
+          <a href="#" onClick={handleOnClick}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6 text-blue-900 cursor-pointer"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+              />
+            </svg>
+          </a>
         </label>
       </div>
       <Footer />
