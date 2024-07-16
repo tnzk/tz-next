@@ -10,12 +10,16 @@
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.4.4",
+    "@types/geojson": "^7946.0.14",
     "countries-and-timezones": "^3.6.0",
+    "country-iso-3-to-2": "^1.1.1",
+    "d3": "^7.9.0",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

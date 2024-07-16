@@ -55,7 +55,7 @@ export default function Home({ params }: Props) {
   return (
     <main className="min-h-screen bg-blue-500">
       <Header withBackButton />
-      <div className="relative flex place-items-center">
+      <div className="relative flex place-items-center justify-center">
         <TimezoneView
           timelike={timelike}
           tz1={tz1 ? decodeURIComponent(tz1) : undefined}
