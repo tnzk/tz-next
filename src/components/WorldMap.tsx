@@ -22,14 +22,17 @@ function addOffsetBand(
   const bandX = (hour + 12) * HOUR_WIDTH - HOUR_WIDTH / 2 + min * MIN_WIDTH;
   svg
     .insert("rect", ":last-child")
-    .attr("class", `offset_band fill-${color}-500/50`)
+    .attr("class", "offset_band")
+    .attr("fill", color)
+    .attr("fill-opacity", 0.5)
     .attr("x", bandX)
     .attr("y", 0)
     .attr("width", HOUR_WIDTH)
     .attr("height", SVG_HEIGHT);
   svg
     .insert("rect", ":last-child")
-    .attr("class", `offset_band fill-${color}-500`)
+    .attr("class", "offset_band")
+    .attr("fill", color)
     .attr("x", bandX + HOUR_WIDTH / 2)
     .attr("y", 0)
     .attr("width", 0.5)
@@ -61,8 +64,8 @@ export default function WorldMap({
     const offsetBands = svg.selectAll("rect.offset_band");
     offsetBands.remove();
 
-    if (offsets[0]) addOffsetBand(svg, offsets[0], "yellow");
-    if (offsets[1]) addOffsetBand(svg, offsets[1], "yellow");
+    if (offsets[0]) addOffsetBand(svg, offsets[0], "black");
+    if (offsets[1]) addOffsetBand(svg, offsets[1], "black");
 
     console.log(offsets);
   }, [offsets]);
