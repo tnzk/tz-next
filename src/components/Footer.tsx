@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className="max-w-lg md:max-w-2xl mx-auto text-left pt-8 pb-4 text-blue-900">
+    <footer className="max-w-lg md:max-w-2xl mx-auto text-left pt-8 pb-4 text-blue-900 pb-24 px-4">
       <div className="mb-4">
         Copyright &copy; {new Date().getFullYear()} Does This Work for You All
         Rights Reserved

@@ -130,7 +130,7 @@ export default function TimezoneView({
         </div>
       </div>
 
-      <div className="my-16">
+      <div className="my-8">
         <WorldMap offsets={offsets} onClick={handleOnClick} />
       </div>
     </div>

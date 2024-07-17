@@ -63,7 +63,7 @@ export default function Home({ params }: Props) {
           onChange={handleOnChange}
         />
       </div>
-      <div className="max-w-lg md:max-w-2xl mx-auto">
+      <div className="max-w-lg md:max-w-2xl mx-auto px-2">
         <label className="bg-white border-2 shadow-md border-blue-600 rounded-xl p-4 flex items-center gap-2 justify-between">
           {copied && (
             <div className="p-2 bg-lime-100 border border-lime-300 text-lime-800 rounded-lg">

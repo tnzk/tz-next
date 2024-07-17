@@ -38,7 +38,7 @@ export default function TimezoneCard({
           {tz && (
             <>
               <div className="text-2xl mb-3">{tz}</div>
-              <div className="text-2xl">
+              <div className="text-xl">
                 <input
                   className="focus:outline-none"
                   type="datetime-local"
