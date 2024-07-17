@@ -103,7 +103,7 @@ export default function TimezoneView({
   }, []);
 
   return (
-    <div className="mt-24 font-serif">
+    <div className="mt-8 md:mt-24 font-serif w-full">
       <div className="max-w-3xl mx-auto">
         <div className="md:flex justify-center md:space-x-8 space-y-4 md:space-y-0">
           <TimezoneCard

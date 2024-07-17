@@ -42,13 +42,11 @@ export default function WorldMap({
       .select("#map")
       .append("svg")
       .attr("class", "w-full")
-      //.attr("viewBox", "0 0 24 24")
-      .attr("width", width)
-      .attr("height", height);
+      .attr("viewBox", "0 0 960 500")
 
     const projection = d3
       .geoMercator()
-      .scale(130)
+      .scale(150)
       .translate([width / 2, height / 1.5]);
     const path = d3.geoPath().projection(projection);
     d3.json("/world.geojson")

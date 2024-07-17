@@ -26,7 +26,7 @@ export const Header = ({ withBackButton = false }: Prop) => {
       )}
       <div
         className={
-          "font-serif w-full text-blue-950 text-center pt-6 px-4 text-5xl " +
+          "font-serif w-full text-blue-950 text-center pt-6 px-4 text-2xl md:text-5xl " +
           (withBackButton ? "" : "pt-32")
         }
       >
