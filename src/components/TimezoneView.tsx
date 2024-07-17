@@ -25,6 +25,14 @@ function getDefaultTime(timelike: string) {
   return Temporal.Now.zonedDateTimeISO("UTC").toInstant();
 }
 
+function timezoneToOffset(timezone: string) {
+  try {
+    return Temporal.Now.zonedDateTimeISO(timezone).offset;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * TimezoneView
  *
@@ -46,15 +54,12 @@ type Props = {
     tz2: string | undefined
   ) => void;
 };
-export default function TimezoneView({
-  tz1,
-  tz2,
-  timelike,
-  onChange,
-}: Props) {
+export default function TimezoneView({ tz1, tz2, timelike, onChange }: Props) {
   // https://tc39.es/proposal-temporal/docs/timezone.html
   const [time, setTime] = useState(getDefaultTime(timelike));
-  const [timezone1, setTimezone1] = useState<string>(tz1 ?? Temporal.Now.timeZoneId());
+  const [timezone1, setTimezone1] = useState<string>(
+    tz1 ?? Temporal.Now.timeZoneId()
+  );
   const [timezone2, setTimezone2] = useState<string>(tz2 ?? "Europe/London");
   const [timezoneOptions1, setTimezoneOptions] = useState<string[]>([]);
   const [timezoneOptions2, setTimezoneOptions2] = useState<string[]>([]);
@@ -80,15 +85,11 @@ export default function TimezoneView({
   };
 
   useEffect(() => {
-    try {
-      const offsets = [
-        Temporal.Now.zonedDateTimeISO(timezone1).offset,
-        Temporal.Now.zonedDateTimeISO(timezone2).offset,
-      ];
-      setOffsets(offsets);
-    } catch {
-      console.info("Invalid timezone identifier(s):", timezone1, timezone2);
-    }
+    const offsets = [
+      timezoneToOffset(timezone1),
+      timezoneToOffset(timezone2),
+    ].filter((e) => e) as string[];
+    setOffsets(offsets);
   }, [time, timezone1, timezone2]);
 
   useEffect(() => {

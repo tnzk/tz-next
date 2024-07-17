@@ -8,6 +8,34 @@ import "./WorldMap.css";
 import { Feature, GeoJsonProperties, Geometry } from "geojson";
 import { Loader } from "./Loader";
 
+const SVG_WIDTH = 960;
+const SVG_HEIGHT = 600;
+const HOUR_WIDTH = SVG_WIDTH / 24;
+const MIN_WIDTH = HOUR_WIDTH / 60;
+
+function addOffsetBand(
+  svg: d3.Selection<d3.BaseType, unknown, HTMLElement, any>,
+  offset: string,
+  color: string
+) {
+  const [hour, min] = offset.split(":").map((s) => parseInt(s));
+  const bandX = (hour + 12) * HOUR_WIDTH - HOUR_WIDTH / 2 + min * MIN_WIDTH;
+  svg
+    .insert("rect", ":last-child")
+    .attr("class", `offset_band fill-${color}-500/50`)
+    .attr("x", bandX)
+    .attr("y", 0)
+    .attr("width", HOUR_WIDTH)
+    .attr("height", SVG_HEIGHT);
+  svg
+    .insert("rect", ":last-child")
+    .attr("class", `offset_band fill-${color}-500`)
+    .attr("x", bandX + HOUR_WIDTH / 2)
+    .attr("y", 0)
+    .attr("width", 0.5)
+    .attr("height", SVG_HEIGHT);
+}
+
 type Props = {
   offsets: string[];
   onClick: (country: Country) => void;
@@ -28,26 +56,43 @@ export default function WorldMap({
   );
 
   useEffect(() => {
-    const oldSvg = d3.select("#map > svg");
-    if (!oldSvg.empty()) {
-      oldSvg
+    if (!offsets) return;
+    const svg = d3.select("#map > svg");
+    const offsetBands = svg.selectAll("rect.offset_band");
+    offsetBands.remove();
+
+    if (offsets[0]) addOffsetBand(svg, offsets[0], "yellow");
+    if (offsets[1]) addOffsetBand(svg, offsets[1], "yellow");
+
+    console.log(offsets);
+  }, [offsets]);
+
+  useEffect(() => {
+    const existingSvg = d3.select("#map > svg");
+    if (!existingSvg.empty()) {
+      existingSvg
         .selectAll<SVGPathElement, Feature>("path")
         .on("click", handleOnClick);
       return;
     }
 
-    const width = 960;
-    const height = 500;
     const svg = d3
       .select("#map")
       .append("svg")
       .attr("class", "w-full")
-      .attr("viewBox", "0 0 960 500")
+      .attr(
+        "viewBox",
+        [0, 0, SVG_WIDTH, SVG_HEIGHT].map((n) => n.toString()).join(" ")
+      );
+    console.log(
+      "sdasa",
+      [0, 0, SVG_WIDTH, SVG_HEIGHT].map((n) => n.toString()).join(" ")
+    );
 
     const projection = d3
       .geoMercator()
       .scale(150)
-      .translate([width / 2, height / 1.5]);
+      .translate([SVG_WIDTH / 2, SVG_HEIGHT / 1.5]);
     const path = d3.geoPath().projection(projection);
     d3.json("/world.geojson")
       .then(function (data: unknown) {
