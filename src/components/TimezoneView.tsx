@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Country } from "countries-and-timezones";
 import WorldMap from "./WorldMap";
 import TimezoneCard from "./TimezoneCard";
+import { OffsetBand } from "@/lib/timezoneHelper";
 
 function getDefaultTime(timelike: string) {
   const keywordTimeMap: Record<string, Temporal.Instant> = {
@@ -63,7 +64,7 @@ export default function TimezoneView({ tz1, tz2, timelike, onChange }: Props) {
   const [timezone2, setTimezone2] = useState<string>(tz2 ?? "Europe/London");
   const [timezoneOptions1, setTimezoneOptions] = useState<string[]>([]);
   const [timezoneOptions2, setTimezoneOptions2] = useState<string[]>([]);
-  const [offsets, setOffsets] = useState<string[]>([]);
+  const [offsets, setOffsets] = useState<OffsetBand[]>([]);
 
   const handleOnClick = (country: Country) => {
     if (timezone1) {
@@ -86,9 +87,9 @@ export default function TimezoneView({ tz1, tz2, timelike, onChange }: Props) {
 
   useEffect(() => {
     const offsets = [
-      timezoneToOffset(timezone1),
-      timezoneToOffset(timezone2),
-    ].filter((e) => e) as string[];
+      { offset: timezoneToOffset(timezone1), color: "orangered" },
+      { offset: timezoneToOffset(timezone2), color: "gold" },
+    ].filter((e) => e.offset) as OffsetBand[];
     setOffsets(offsets);
   }, [time, timezone1, timezone2]);
 
@@ -115,6 +116,7 @@ export default function TimezoneView({ tz1, tz2, timelike, onChange }: Props) {
             onChangeTimezone={(tz) => setTimezone1(tz)}
             onReset={() => setTimezone1("")}
             placeholder="Click where you are in"
+            color="orangered"
           />
 
           {timezone1 && (
@@ -126,7 +128,8 @@ export default function TimezoneView({ tz1, tz2, timelike, onChange }: Props) {
               onChangeTimezone={(tz) => setTimezone2(tz)}
               onReset={() => setTimezone2("")}
               placeholder="Click where your respondent is in"
-            />
+              color="gold"
+              />
           )}
         </div>
       </div>

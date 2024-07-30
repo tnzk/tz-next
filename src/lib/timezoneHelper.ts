@@ -3,6 +3,11 @@ import { Temporal } from "@js-temporal/polyfill";
 // offset is undefined when the name is recognized by Temporal
 export type ResolvedTimezoneAbbrev = { name: string; offset: string | undefined };
 
+export type OffsetBand = {
+  offset: string;
+  color: string; // SVG color keyword
+}
+
 export async function lookupTimezoneAbbrev(
   abbrev: string
 ): Promise<ResolvedTimezoneAbbrev[]> {

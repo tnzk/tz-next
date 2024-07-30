@@ -11,6 +11,7 @@ type Props = {
   onChangeTimezone: (timezone: string) => void;
   onReset: () => void;
   placeholder: string;
+  color: string;
 };
 export default function TimezoneCard({
   tz,
@@ -20,6 +21,7 @@ export default function TimezoneCard({
   onChangeTimezone,
   onReset,
   placeholder,
+  color,
 }: Props) {
   const [localtime, setLocaltime] = useState("");
 
@@ -37,7 +39,10 @@ export default function TimezoneCard({
         <div className="flex-1">
           {tz && (
             <>
-              <div className="text-2xl mb-3">{tz}</div>
+              <div className="flex items-center space-x-4 mb-3">
+                <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }}></div>
+                <div className="text-2xl">{tz}</div>
+              </div>
               <div className="text-xl">
                 <input
                   className="focus:outline-none"
